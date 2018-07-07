@@ -1,15 +1,23 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { createStore } from 'react-redux';
+import thunk from 'redux-thunk';
+import { createStore, compose, applyMiddleware } from 'redux';
+import rootReducer from './rootReducer';
 
 // Resources
-import 'semantic-ui-css/sematic.min.css'
+import 'semantic-ui-css/semantic.min.css'
 
 // Components
 import Root from './Root';
 
-
 import registerServiceWorker from './registerServiceWorker';
 
-render(<Root />, document.getElementById('root'));
+const store = createStore(
+    rootReducer,
+    compose(
+        applyMiddleware(thunk)
+    )
+)
+
+render(<Root store={store} />, document.getElementById('root'));
 registerServiceWorker();
