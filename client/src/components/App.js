@@ -5,6 +5,7 @@ import { Switch, Route } from 'react-router-dom';
 import MainLayout from './MainLayout';
 import Greetings from './Greetings';
 import Customers from './Customers';
+import NewCustomer from './NewCustomer';
 
 class componentName extends Component {
     render() {
@@ -12,7 +13,8 @@ class componentName extends Component {
             <Switch>
                 <MainLayout>
                     <Route exact path="/" component={ Greetings }></Route>
-                    <Route path="/customers" component={ Customers }></Route>
+                    <Route exact path="/customers" component={ Customers }></Route>
+                    <Route path="/customers/new" component={ NewCustomer }></Route>
                 </MainLayout>
             </Switch>
         )

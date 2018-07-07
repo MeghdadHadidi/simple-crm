@@ -14,9 +14,11 @@ routes.get('/all', (req, res, next) => {
     res.status(200).json({
         customers: [
             {
-                id: 1,
+                id: 1, 
                 name: 'meghdad',
-                lastName: 'hadidi'
+                birthday: '435345',
+                gender: 'm',
+                value: 123
             }
         ]
     })
