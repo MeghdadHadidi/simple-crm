@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getCustomersList } from '../../actions/customers';
 import {
-    Header, Icon, Menu, Grid
+    Header, Icon, Menu, Grid, Loader, Dimmer
 } from 'semantic-ui-react';
 
 // Components
@@ -12,35 +12,42 @@ import CustomerItem from '../CustomerItem';
 
 class Customers extends Component {
     state = {
-        customers: []
+        loading: true,
+        customers: null
     }
 
     componentWillMount(){
         this.props.getCustomersList()
             .then((res) => {
                 this.setState({
-                    customers: this.state.customers.concat(res.data.customers)
+                    loading: false,
+                    customers: res.data.customerList
                 })
             });
     }
 
     render() {
-        const { customers } = this.state;
+        const { customers, loading } = this.state;
 
         return (
             <React.Fragment>
                 <Menu>
                     <Menu.Item icon as={Link} to='/customers/new' name='new'>
-                        <Icon name='add' />
-                        Add customer
+                        <Icon style={{marginRight: 10}} name='add' />
+                          Add customer
                     </Menu.Item>
                     <Menu.Item icon as={Link} to='/customers' name='all'>
-                        <Icon name='users' />
-                        List customers
+                        <Icon style={{marginRight: 10}} name='users' />
+                          List customers
                     </Menu.Item>
                 </Menu>
                 <Grid padded columns={4}>
-                    {!customers.length && 
+                    {loading && 
+                        <Dimmer active inverted>
+                            <Loader inverted>Loading Customers ...</Loader>
+                        </Dimmer>
+                    }
+                    {(customers && !customers.length) && 
                         <Header as='h2' icon textAlign='center'>
                             <Icon name='users' />
                             Customers
@@ -48,10 +55,10 @@ class Customers extends Component {
                         </Header>
                     }
 
-                    {customers.length && 
-                    this.state.customers.map((item, index) => (
-                        <Grid.Column key={index}><CustomerItem customer={item} /></Grid.Column>
-                    ))
+                    {
+                        customers && this.state.customers.map((item, index) => (
+                            <Grid.Column key={index}><CustomerItem customer={item} /></Grid.Column>
+                        ))
                     }
                 </Grid>
             </React.Fragment>

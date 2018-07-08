@@ -5,16 +5,38 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 // Actions
-import { addCustomer, editCustomer } from '../../actions/customers';
+import { addCustomer, getCustomer, editCustomer } from '../../actions/customers';
 import { showFlashMessage } from '../../actions/flashMessages';
 
 class NewCustomerForm extends Component {
     state = {
-        customerID: '',
-        firstname: '',
-        lastname: '',
-        gender: '',
-        birthday: ''
+        customer: {
+            customerID: '',
+            firstname: '',
+            lastname: '',
+            gender: '',
+            description: '',
+            birthday: ''
+        }
+    }
+
+    componentWillMount(){
+        const { match } = this.props;
+
+        if(match.params.id){
+            this.props.getCustomer(match.params.id)
+                .then(({ data }) => {
+                    if(data.ok){
+                        let customer = data.customer;
+                        customer.firstname = customer.name.first;
+                        customer.lastname = customer.name.last;
+                        delete customer.name;
+                        this.setState({
+                            customer
+                        });
+                    }
+                });
+        }
     }
 
     addNewCustomer = () => {
@@ -40,7 +62,7 @@ class NewCustomerForm extends Component {
     }
 
     editCustomer = () => {
-        this.props.editCustomer(this.state)
+        this.props.editCustomer(this.state.customer)
             .then(({ data }) => {
                 if(data.ok){
                     this.props.history.push('/customers');
@@ -53,7 +75,7 @@ class NewCustomerForm extends Component {
     }
 
     handleSubmit = () => {
-        if(this.state.customerID){
+        if(this.state.customer.customerID){
             this.editCustomer();
         }
         else{
@@ -63,22 +85,30 @@ class NewCustomerForm extends Component {
 
     handleChange = (e, component) => {
         this.setState({
-            [component.name]: component.value
+            customer: {
+                ...this.state.customer,
+                [component.name]: component.value
+            }
         })
     }
 
     render() {
+        let { customer } = this.state;
+
         return (
             <Form onSubmit={this.handleSubmit}>
                 <Form.Group unstackable widths={2}>
-                    <Form.Input onChange={this.handleChange} required name='firstname' label='First name' placeholder='First name' />
-                    <Form.Input onChange={this.handleChange} required name='lastname' label='Last name' placeholder='Last name' />
+                    <Form.Input onChange={this.handleChange} required value={customer.firstname} name='firstname' label='First name' placeholder='First name' />
+                    <Form.Input onChange={this.handleChange} required value={customer.lastname} name='lastname' label='Last name' placeholder='Last name' />
                 </Form.Group>
                 <Form.Group widths={2}>
-                    <Form.Input onChange={this.handleChange} required name='birthday' label='Birthdate' placeholder='Birthdate' />
-                    <Form.Input onChange={this.handleChange} required name='gender' label='Gender' placeholder='Gender' />
+                    <Form.Input onChange={this.handleChange} required value={customer.birthday} name='birthday' label='Birthdate' placeholder='Birthdate' />
+                    <Form.Input onChange={this.handleChange} required value={customer.gender} name='gender' label='Gender' placeholder='Gender' />
                 </Form.Group>
-                <Button type='submit'>{this.state.customerID ? 'Edit' : 'Add'}</Button>
+                <Form.Group widths={2}>
+                    <Form.TextArea required name='description' value={customer.description} placeholder='Enter customer description'></Form.TextArea>
+                </Form.Group>
+                <Button type='submit'>{this.state.customer.customerID ? 'Edit' : 'Add'}</Button>
             </Form>
         );
     }
@@ -87,7 +117,10 @@ class NewCustomerForm extends Component {
 NewCustomerForm.propTypes = {
     addCustomer: PropTypes.func.isRequired,
     editCustomer: PropTypes.func.isRequired,
+    customer: PropTypes.object,
+    match: PropTypes.object.isRequired,
     showFlashMessage: PropTypes.func.isRequired,
+    getCustomer: PropTypes.func.isRequired
 }
 
-export default withRouter(connect(null, { addCustomer, editCustomer, showFlashMessage })(NewCustomerForm));
+export default withRouter(connect(null, { addCustomer, getCustomer, editCustomer, showFlashMessage })(NewCustomerForm));

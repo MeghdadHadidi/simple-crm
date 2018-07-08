@@ -26,6 +26,6 @@ export function deleteCustomer(identifier){
 
 export function editCustomer(customerData){
     return dispatch => {
-        return axios.update(`/customers/${customerData.customerID}`, customerData);
+        return axios.put(`/customers/${customerData.customerID}`, customerData);
     }
 }

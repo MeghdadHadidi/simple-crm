@@ -59,10 +59,116 @@ routes.post('/new', [
 });
 
 routes.get('/all', (req, res, next) => {
-    res.status(200).json({
-        ok: true,
-        customers
+    Customer.find({}, (err, customers) => {
+        if(err){
+            log(chalk.orange('Problem when listing customers', JSON.stringify(err, null, 2)));
+            res.status(422).json({
+                ok: false,
+                error: err
+            });
+        }
+
+        let customerList = customers.map((item, index) => {
+            return {
+                customerID: item._id,
+                name: item.name,
+                birthday: item.birthday,
+                gender: item.gender
+            }
+        });
+
+        log(chalk.green('No Errors: ', JSON.stringify(customerList, null, 2)));
+
+        res.status(200).json({
+            ok: true,
+            customerList
+        })
     })
-})
+});
+
+routes.get('/:id', (req, res, next) => {
+    if(req.params.id){
+        Customer.find({ _id: req.params.id }, (err, customer) => {
+            if(err){
+                log(chalk.error('Mongo Errors: ', JSON.stringify(err, null, 2)));
+
+                res.status(422).json({
+                    ok: false,
+                    error: err
+                });
+            }
+
+            if(!customer){
+                log(chalk.error('No customer found'));
+
+                res.status(404).json({
+                    ok: false,
+                    customer
+                });
+            }
+
+            log(chalk.green('No Errors: ', JSON.stringify(customer, null, 2)));
+            
+            let { name, birthday, gender, lastContact, customerLifetimeValue } = customer[0];
+
+            delete customer[0]._id;
+            res.status(200).json({
+                ok: true,
+                customer: {
+                    name, birthday, gender, lastContact, customerLifetimeValue, customerID: customer[0]._id
+                }
+            });
+        })
+    }
+    else{
+        res.status(422).json({
+            ok: false,
+            error: 'No identifier provided!'
+        })
+    }
+});
+
+routes.put('/:id', [
+    check('customerID').isString()
+], (req, res, next) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        log(chalk.red('Validation Errors: ', JSON.stringify(errors.array(), null, 2)));
+
+        res.status(422).json({
+            ok: false,
+            errors: errors.array()
+        });
+    }
+
+    if(req.params.id){
+        Customer.findByIdAndUpdate(req.params.id, req.body, (err, customer) => {
+            if(err){
+                log(chalk.red('Mongo Error: ', JSON.stringify(err, null, 2)));
+
+                res.status(422).json({
+                    ok: false,
+                    error: err
+                });
+            }
+
+            if(!customer){
+                log(chalk.red('No customer found', JSON.stringify(customer, null, 2)));
+
+                res.status(404).json({
+                    ok: false,
+                    error: 'No customer found with provided ID'
+                });
+            }
+
+            log(chalk.green('Trying to edit: ', JSON.stringify(customer, null, 2)));
+            res.status(200).json({
+                ok: true,
+                customer
+            })
+        });
+    }
+});
 
 export default routes;
