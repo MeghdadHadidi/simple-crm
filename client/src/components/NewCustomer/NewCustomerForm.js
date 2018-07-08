@@ -40,7 +40,7 @@ class NewCustomerForm extends Component {
     }
 
     addNewCustomer = () => {
-        this.props.addCustomer(this.state)
+        this.props.addCustomer(this.state.customer)
             .then(({ data }) => {
                 if(data.ok){
                     this.props.showFlashMessage({
@@ -106,7 +106,7 @@ class NewCustomerForm extends Component {
                     <Form.Input onChange={this.handleChange} required value={customer.gender} name='gender' label='Gender' placeholder='Gender' />
                 </Form.Group>
                 <Form.Group widths={2}>
-                    <Form.TextArea required name='description' value={customer.description} placeholder='Enter customer description'></Form.TextArea>
+                    <Form.TextArea onChange={this.handleChange} required name='description' value={customer.description} placeholder='Enter customer description'></Form.TextArea>
                 </Form.Group>
                 <Button type='submit'>{this.state.customer.customerID ? 'Edit' : 'Add'}</Button>
             </Form>

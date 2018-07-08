@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getCustomersList } from '../../actions/customers';
 import {
-    Header, Icon, Menu, Grid, Loader, Dimmer
+    Header, Ico, deleteCustomern, Menu, Grid, Loader, Dimmer
 } from 'semantic-ui-react';
+
+// Actions
+import { getCustomersList, deleteCustomer } from '../../actions/customers';
 
 // Components
 import CustomerItem from '../CustomerItem';
@@ -24,6 +26,15 @@ class Customers extends Component {
                     customers: res.data.customerList
                 })
             });
+    }
+
+    deleteCustomer = (customerID) => {
+        this.props.deleteCustomer(customerID)
+            .then(({ data }) => {
+                if(data.ok){
+                    
+                }
+            })
     }
 
     render() {
@@ -57,7 +68,7 @@ class Customers extends Component {
 
                     {
                         customers && this.state.customers.map((item, index) => (
-                            <Grid.Column key={index}><CustomerItem customer={item} /></Grid.Column>
+                            <Grid.Column key={index}><CustomerItem onDelete={this.deleteCustomer} customer={item} /></Grid.Column>
                         ))
                     }
                 </Grid>
@@ -67,7 +78,8 @@ class Customers extends Component {
 }
 
 Customers.propTypes = {
-    getCustomersList: PropTypes.func.isRequired
+    getCustomersList: PropTypes.func.isRequired,
+    deleteCustomer: PropTypes.func.isRequired
 }
 
-export default connect(null, { getCustomersList })(Customers);
+export default connect(null, { getCustomersList, deleteCustomer })(Customers);
