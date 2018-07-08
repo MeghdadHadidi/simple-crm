@@ -28,7 +28,7 @@ routes.post('/new', [
     
     if(!errors.isEmpty()){
         log(chalk.red('Validation Errors: ', JSON.stringify(errors.array(), null, 2)));
-        res.status(422).json({
+        return res.status(422).json({
             errors: errors.array()
         })
     }
@@ -45,7 +45,7 @@ routes.post('/new', [
     customer.save((err, customer) => {
         if(err){
             log(chalk.red('Mongo Errors: ', JSON.stringify(err, null, 2)));
-            res.status(422).json({
+            return res.status(422).json({
                 errors: err
             })
         }
@@ -62,7 +62,7 @@ routes.get('/all', (req, res, next) => {
     Customer.find({}, (err, customers) => {
         if(err){
             log(chalk.orange('Problem when listing customers', JSON.stringify(err, null, 2)));
-            res.status(422).json({
+            return res.status(422).json({
                 ok: false,
                 error: err
             });
@@ -92,7 +92,7 @@ routes.get('/:id', (req, res, next) => {
             if(err){
                 log(chalk.error('Mongo Errors: ', JSON.stringify(err, null, 2)));
 
-                res.status(422).json({
+                return res.status(422).json({
                     ok: false,
                     error: err
                 });
@@ -101,7 +101,7 @@ routes.get('/:id', (req, res, next) => {
             if(!customer){
                 log(chalk.error('No customer found'));
 
-                res.status(404).json({
+                return res.status(404).json({
                     ok: false,
                     customer
                 });
@@ -121,7 +121,7 @@ routes.get('/:id', (req, res, next) => {
         })
     }
     else{
-        res.status(422).json({
+        return res.status(422).json({
             ok: false,
             error: 'No identifier provided!'
         })
@@ -136,18 +136,25 @@ routes.put('/:id', [
     if(!errors.isEmpty()){
         log(chalk.red('Validation Errors: ', JSON.stringify(errors.array(), null, 2)));
 
-        res.status(422).json({
+        return res.status(422).json({
             ok: false,
             errors: errors.array()
         });
     }
 
     if(req.params.id){
-        Customer.findByIdAndUpdate(req.params.id, req.body, (err, customer) => {
+        let newCustomer = req.body;
+        newCustomer.name = {
+            first: req.body.firstname,
+            last: req.body.lastname
+        }
+        delete newCustomer.firstname;
+        delete newCustomer.lastname;
+        Customer.findByIdAndUpdate(req.params.id, newCustomer, (err, customer) => {
             if(err){
                 log(chalk.red('Mongo Error: ', JSON.stringify(err, null, 2)));
 
-                res.status(422).json({
+                return res.status(422).json({
                     ok: false,
                     error: err
                 });
@@ -156,18 +163,37 @@ routes.put('/:id', [
             if(!customer){
                 log(chalk.red('No customer found', JSON.stringify(customer, null, 2)));
 
-                res.status(404).json({
+                return res.status(404).json({
                     ok: false,
                     error: 'No customer found with provided ID'
                 });
             }
 
-            log(chalk.green('Trying to edit: ', JSON.stringify(customer, null, 2)));
+            log(chalk.red('Trying to edit: ', JSON.stringify(customer, null, 2)));
             res.status(200).json({
                 ok: true,
                 customer
             })
         });
+    }
+});
+
+
+routes.delete('/:id', (req, res) => {
+    if(req.params.id){
+        Customer.findByIdAndRemove(req.params.id, (err, customer) => {
+            if(err){
+                return res.status(500).json({
+                    ok: false,
+                    error: err
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                customer
+            })
+        })
     }
 });
 

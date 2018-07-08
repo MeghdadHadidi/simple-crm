@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Card, Menu, Icon, Image, Button, Popup, Confirm } from 'semantic-ui-react'
+import { Card, Menu, Icon, Image, Popup, Confirm } from 'semantic-ui-react'
 import faker from 'faker'
 
 class CustomerItem extends React.Component {
@@ -16,7 +16,13 @@ class CustomerItem extends React.Component {
     }
 
     handleConfirmApprove = () => {
-        this.props.deleteCustomer(this.props.customer.customerID);
+        this.props.onDelete(this.props.customer.customerID).then(({ data }) => {
+            if(data.ok){
+                this.setState({
+                    confirmOpen: false
+                })
+            }
+        })
     }
 
     handleConfirmCancel = () => {
@@ -51,7 +57,7 @@ class CustomerItem extends React.Component {
                             content={`Edit ${customer.name.first}`}
                             />
                     </Menu.Item>
-                    <Menu.Item onClick={this.showConfirm} as={Link} style={{float: 'right'}} to={`/customers/delete/${customer.customerID}`}>
+                    <Menu.Item onClick={this.showConfirm} style={{float: 'right'}}>
                         <Popup
                             trigger={<Icon color='red' name='trash' />}
                             content={`Delete ${customer.name.first}`}
@@ -66,7 +72,8 @@ class CustomerItem extends React.Component {
 }
 
 CustomerItem.propTypes = {
-    customer: PropTypes.object.isRequired
+    customer: PropTypes.object.isRequired,
+    onDelete: PropTypes.func.isRequired
 }
 
 export default CustomerItem

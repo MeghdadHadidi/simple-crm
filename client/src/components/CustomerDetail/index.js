@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import faker from 'faker';
 import {
     Dimmer, Icon, Loader, Message, Segment, Menu, Header, Image, Divider
 } from 'semantic-ui-react';
 
 // Actions
-import { getCustomer } from '../../actions/customers';
+import { getCustomer, deleteCustomer } from '../../actions/customers';
+import { showFlashMessage } from '../../actions/flashMessages';
 
 const ServiceCallingMessage = ({ error }) => {
     if(error){
@@ -61,6 +62,20 @@ class CustomerDetailPage extends Component {
             });
     }
 
+    deleteCustomer = () => {
+        this.props.deleteCustomer(this.state.customer.customerID)
+            .then(({ data }) => {
+                if(data.ok){
+                    this.props.showFlashMessage({
+                        type: 'info',
+                        title: 'Delete Successful',
+                        text: 'Customer deleted successfuly'
+                    });
+                    this.props.history.push('/customers');
+                }
+            })
+    }
+
     render() {
         const { customer, loading, error } = this.state;
         return (
@@ -74,7 +89,7 @@ class CustomerDetailPage extends Component {
                         <Icon style={{marginRight: 10}} name='edit' />
                           Edit
                     </Menu.Item>
-                    <Menu.Item icon as={Link} to={`/customers/delete/${customer.customerID}`} name='delete'>
+                    <Menu.Item icon onClick={this.deleteCustomer} name='delete'>
                         <Icon style={{marginRight: 10}} name='delete' />
                           Delete
                     </Menu.Item>
@@ -96,7 +111,9 @@ class CustomerDetailPage extends Component {
 }
 
 CustomerDetailPage.propTypes = {
-    getCustomer: PropTypes.func.isRequired
+    getCustomer: PropTypes.func.isRequired,
+    deleteCustomer: PropTypes.func.isRequired,
+    showFlashMessage: PropTypes.func.isRequired
 }
 
-export default connect(null, { getCustomer })(CustomerDetailPage);
+export default withRouter(connect(null, { getCustomer, deleteCustomer, showFlashMessage })(CustomerDetailPage));

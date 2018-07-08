@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import {
-    Header, Ico, deleteCustomern, Menu, Grid, Loader, Dimmer
+    Header, Menu, Grid, Loader, Dimmer, Icon
 } from 'semantic-ui-react';
 
 // Actions
 import { getCustomersList, deleteCustomer } from '../../actions/customers';
+import { showFlashMessage } from '../../actions/flashMessages';
 
 // Components
 import CustomerItem from '../CustomerItem';
@@ -18,7 +19,7 @@ class Customers extends Component {
         customers: null
     }
 
-    componentWillMount(){
+    getCustomersList = () => {
         this.props.getCustomersList()
             .then((res) => {
                 this.setState({
@@ -28,11 +29,22 @@ class Customers extends Component {
             });
     }
 
+    componentWillMount(){
+        this.getCustomersList();
+    }
+
     deleteCustomer = (customerID) => {
-        this.props.deleteCustomer(customerID)
+        return this.props.deleteCustomer(customerID)
             .then(({ data }) => {
                 if(data.ok){
-                    
+                    this.props.showFlashMessage({
+                        type: 'info',
+                        title: 'Delete Successful',
+                        text: 'Customer deleted successfuly'
+                    });
+                    this.getCustomersList();
+
+                    return { data };
                 }
             })
     }
@@ -79,7 +91,8 @@ class Customers extends Component {
 
 Customers.propTypes = {
     getCustomersList: PropTypes.func.isRequired,
-    deleteCustomer: PropTypes.func.isRequired
+    deleteCustomer: PropTypes.func.isRequired,
+    showFlashMessage: PropTypes.func.isRequired
 }
 
-export default connect(null, { getCustomersList, deleteCustomer })(Customers);
+export default withRouter(connect(null, { getCustomersList, deleteCustomer, showFlashMessage })(Customers));

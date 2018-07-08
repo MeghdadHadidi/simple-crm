@@ -65,11 +65,12 @@ class NewCustomerForm extends Component {
         this.props.editCustomer(this.state.customer)
             .then(({ data }) => {
                 if(data.ok){
+                    this.props.showFlashMessage({
+                        type: 'info',
+                        title: 'Edit',
+                        text: 'Customer edited successfuly'
+                    });
                     this.props.history.push('/customers');
-                    debugger;
-                }
-                else{
-                    console.error(data);
                 }
             });
     }
