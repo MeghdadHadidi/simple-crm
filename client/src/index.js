@@ -6,6 +6,7 @@ import rootReducer from './rootReducer';
 
 // Resources
 import 'semantic-ui-css/semantic.min.css'
+import 'izitoast/dist/css/iziToast.min.css'
 
 // Components
 import Root from './Root';

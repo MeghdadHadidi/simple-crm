@@ -9,7 +9,7 @@ class CustomerItem extends React.Component {
         
         return(
             <Card>
-                <Image src={faker.internet.avatar()} />
+                <Image style={{height: '200px'}} src={faker.internet.avatar()} />
                 <Card.Content>
                     <Card.Header>{customer.name}</Card.Header>
                     <Card.Meta>

@@ -10,7 +10,7 @@ class MainLayout extends Component {
         return (
             <ResponsiveContainer>
                 <Segment style={{ padding: '8em 0em' }} vertical>
-                    <Container text>
+                    <Container>
                       { this.props.children }
                     </Container>
                 </Segment>
