@@ -104,6 +104,10 @@ class CustomerDetailPage extends Component {
                         <Divider horizontal>{customer.name.first} {customer.name.last}</Divider>
                     </Header>
                     <Header.Subheader>{customer.description}</Header.Subheader>
+                    <div>{customer.gender}</div>
+                    <div>{customer.birthday}</div>
+                    <div>{customer.lastContact}</div>
+                    <div>{customer.customerLifetimeValue}</div>
                 </Segment>
             </React.Fragment>
         );
