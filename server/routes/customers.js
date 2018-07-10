@@ -90,7 +90,7 @@ routes.get('/:id', (req, res, next) => {
     if(req.params.id){
         Customer.find({ _id: req.params.id }, (err, customer) => {
             if(err){
-                log(chalk.error('Mongo Errors: ', JSON.stringify(err, null, 2)));
+                log(chalk.red('Mongo Errors: ', JSON.stringify(err, null, 2)));
 
                 return res.status(422).json({
                     ok: false,
