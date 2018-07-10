@@ -22,8 +22,10 @@
   },
   "proxy": "http://localhost:5000/api",
   "devDependencies": {
+    "chai": "^4.1.2",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
+    "mocha": "^5.2.0",
     "react-addons-test-utils": "^15.6.2"
   }
 }
